@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer7452 Hud_screen</title>
+    <style>
+        /* Estilos generales */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Animación de texto */
+        .animation {
+            position: absolute;
+            font-size: 2em;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: fadeOut 2s 2s forwards;
+        }
+
+        /* Animación de desaparición */
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        /* Contenedor de opciones */
+        .container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container.active {
+            display: flex;
+        }
+        select, input {
+            padding: 10px;
+            font-size: 1em;
+            margin: 10px 0;
+            width: 200px;
+        }
+        label {
+            margin-top: 10px;
+        }
+
+        /* Flecha de descarga */
+        .download-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            text-decoration: none;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Texto de animación -->
+    <div id="animatedText" class="animation">Developer7452 Hud_screen</div>
+
+    <!-- Dropdown para tipo de animación -->
+    <div id="container" class="container">
+        <label for="animationType">¿Qué tipo de animación quieres?</label>
+        <select id="animationType" onchange="displayOptions()">
+            <option value="">Selecciona una opción</option>
+            <option value="image">Imagen</option>
+            <option value="video">Video</option>
+        </select>
+
+        <!-- Opciones para Imagen -->
+        <div id="imageOptions" style="display: none;">
+            <label for="imageName">Nombre de la imagen</label>
+            <input type="text" id="imageName" placeholder="Ingresa el nombre">
+            
+            <label for="imageSize">Tamaño de la imagen (Ej: 256, 256)</label>
+            <input type="text" id="imageSize" placeholder="Ej: 256, 256">
+
+            <label for="imageDuration">Duración de la imagen (segundos)</label>
+            <input type="number" id="imageDuration" placeholder="Ingresa duración">
+
+            <button onclick="applyChanges()">Aplicar cambios</button>
+            <p id="errorMessage" style="color: red; display: none;">Error: El tamaño debe estar en formato "256, 256".</p>
+        </div>
+    </div>
+
+    <!-- Icono de descarga -->
+    <a id="downloadIcon" href="#" class="download-icon" download="hud_screen.json">&#x2193;</a>
+
+    <script>
+        let documentData = {
+            "textures": { "ui": "textures/ui/default_image" },
+            "imageSize": "[default_size]",
+            "duration": "//tiempo default_duration"
+        };
+
+        // Mostrar dropdown después de animación
+        setTimeout(() => {
+            document.getElementById('container').classList.add('active');
+        }, 4000);
+
+        // Mostrar opciones de edición para Imagen
+        function displayOptions() {
+            const type = document.getElementById('animationType').value;
+            document.getElementById('imageOptions').style.display = type === "image" ? "block" : "none";
+            document.getElementById('downloadIcon').href = type === "image" ? "image/hud_screen.json" : "video/hud_screen";
+        }
+
+        // Aplicar cambios en el documento JSON
+        function applyChanges() {
+            const name = document.getElementById('imageName').value;
+            const size = document.getElementById('imageSize').value;
+            const duration = document.getElementById('imageDuration').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Validar formato del tamaño de la imagen
+            if (!/^\d+,\s*\d+$/.test(size)) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            errorMessage.style.display = 'none';
+
+            // Aplicar cambios al documento
+            documentData.textures.ui = `textures/ui/${name}`;
+            documentData.imageSize = `[${size}]`;
+            documentData.duration = `//tiempo ${duration}`;
+
+            // Generar enlace de descarga con el documento modificado
+            const blob = new Blob([JSON.stringify(documentData, null, 2)], { type: 'application/json' });
+            const downloadUrl = URL.createObjectURL(blob);
+            document.getElementById('downloadIcon').href = downloadUrl;
+        }
+    </script>
+</body>
+</html>
